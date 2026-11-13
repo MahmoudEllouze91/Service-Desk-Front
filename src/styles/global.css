@@ -10,6 +10,28 @@
   white-space: nowrap;
 }
 
+.request-table__sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+}
+
+.request-table__sort span {
+  font-size: 0.9rem;
+}
+
+.request-table__sort:focus-visible {
+  outline: 2px solid var(--bs-primary);
+  outline-offset: 3px;
+}
+
 .request-table__summary {
   max-width: 25rem;
   min-width: 16rem;

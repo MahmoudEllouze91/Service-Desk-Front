@@ -57,7 +57,7 @@ function RequestPage() {
 
         <div className="card-body border-bottom">
           <div className="row g-3 align-items-end">
-            <div className="col-12 col-md-6 col-xl-3">
+            <div className="col-12 col-md-6 col-xl-6">
               <label htmlFor="request-title-filter" className="form-label">
                 Filter by title
               </label>
@@ -70,7 +70,7 @@ function RequestPage() {
                 onChange={(event) => setTitleFilter(event.target.value)}
               />
             </div>
-            <div className="col-12 col-md-6 col-xl-3">
+            <div className="col-12 col-md-6 col-xl-6">
               <label htmlFor="request-status-filter" className="form-label">
                 Filter by status
               </label>
@@ -94,49 +94,6 @@ function RequestPage() {
                 <option value="NEW">New</option>
                 <option value="IN_PROGRESS">In progress</option>
                 <option value="RESOLVED">Resolved</option>
-              </select>
-            </div>
-            <div className="col-12 col-md-6 col-xl-3">
-              <label htmlFor="request-sort-by" className="form-label">
-                Sort by
-              </label>
-              <select
-                id="request-sort-by"
-                className="form-select"
-                value={sortBy}
-                onChange={(event) => {
-                  const value = event.target.value
-                  if (
-                    value === 'createdAt' ||
-                    value === 'title' ||
-                    value === 'status'
-                  ) {
-                    setSortBy(value)
-                  }
-                }}
-              >
-                <option value="createdAt">Date created</option>
-                <option value="title">Title</option>
-                <option value="status">Status</option>
-              </select>
-            </div>
-            <div className="col-12 col-md-6 col-xl-3">
-              <label htmlFor="request-sort-order" className="form-label">
-                Sort order
-              </label>
-              <select
-                id="request-sort-order"
-                className="form-select"
-                value={sortOrder}
-                onChange={(event) => {
-                  const value = event.target.value
-                  if (value === 'asc' || value === 'desc') {
-                    setSortOrder(value)
-                  }
-                }}
-              >
-                <option value="desc">Descending</option>
-                <option value="asc">Ascending</option>
               </select>
             </div>
           </div>
@@ -171,7 +128,19 @@ function RequestPage() {
                 </p>
               </div>
             ) : (
-              <RequestTable requests={requests} />
+              <RequestTable
+                requests={requests}
+                sortBy={sortBy}
+                sortOrder={sortOrder}
+                onSort={(column) => {
+                  if (sortBy === column) {
+                    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+                  } else {
+                    setSortBy(column);
+                    setSortOrder("desc");
+                  }
+                }}
+              />
             )}
             <div className="card-footer bg-white d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
               <div className="small text-body-secondary" aria-live="polite">

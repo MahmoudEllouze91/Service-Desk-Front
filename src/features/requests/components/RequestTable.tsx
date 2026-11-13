@@ -1,7 +1,14 @@
-import type { ServiceRequest } from '../types/request.types'
+import type {
+  RequestSortBy,
+  RequestSortOrder,
+  ServiceRequest,
+} from '../types/request.types'
 
 interface RequestTableProps {
   requests: ServiceRequest[]
+  sortBy: RequestSortBy
+  sortOrder: RequestSortOrder
+  onSort: (column: RequestSortBy) => void
 }
 
 const statusStyles: Record<ServiceRequest['status'], string> = {
@@ -29,19 +36,89 @@ function formatDate(value: string) {
   return Number.isNaN(date.getTime()) ? 'Unknown' : `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
 }
 
-function RequestTable({ requests }: RequestTableProps) {
+interface SortableHeaderProps {
+  label: string
+  column: RequestSortBy
+  sortBy: RequestSortBy
+  sortOrder: RequestSortOrder
+  onSort: (column: RequestSortBy) => void
+}
+
+function SortableHeader({
+  label,
+  column,
+  sortBy,
+  sortOrder,
+  onSort,
+}: SortableHeaderProps) {
+  const isActive = sortBy === column
+  const nextOrder = isActive && sortOrder === 'desc' ? 'asc' : 'desc'
+  const arrow = isActive ? (sortOrder === 'asc' ? '↑' : '↓') : '↕'
+
+  return (
+    <th
+      scope="col"
+      aria-sort={
+        isActive
+          ? sortOrder === 'asc'
+            ? 'ascending'
+            : 'descending'
+          : 'none'
+      }
+    >
+      <button
+        type="button"
+        className="request-table__sort"
+        onClick={() => onSort(column)}
+        aria-label={
+          isActive
+            ? `${label}, sorted ${sortOrder}; activate to sort ${nextOrder}`
+            : `Sort by ${label} in descending order`
+        }
+      >
+        {label}
+        <span aria-hidden="true">{arrow}</span>
+      </button>
+    </th>
+  )
+}
+
+function RequestTable({
+  requests,
+  sortBy,
+  sortOrder,
+  onSort,
+}: RequestTableProps) {
   return (
     <div className="table-responsive">
       <table className="table table-hover align-middle mb-0 request-table">
         <thead className="table-light">
           <tr>
-            <th scope="col">Request</th>
+            <SortableHeader
+              label="Title"
+              column="title"
+              sortBy={sortBy}
+              sortOrder={sortOrder}
+              onSort={onSort}
+            />
             <th scope="col">Category</th>
-            <th scope="col">Status</th>
+            <SortableHeader
+              label="Status"
+              column="status"
+              sortBy={sortBy}
+              sortOrder={sortOrder}
+              onSort={onSort}
+            />
             <th scope="col">Urgency</th>
             <th scope="col">Creator ID</th>
             <th scope="col">Assigned operator</th>
-            <th scope="col">Created</th>
+            <SortableHeader
+              label="Date created"
+              column="createdAt"
+              sortBy={sortBy}
+              sortOrder={sortOrder}
+              onSort={onSort}
+            />
           </tr>
         </thead>
         <tbody>
