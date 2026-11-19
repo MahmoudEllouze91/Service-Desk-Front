@@ -16,6 +16,30 @@ export interface ServiceRequest {
   createdAt: string
 }
 
+export interface RequestUserSummary {
+  firstname: string | null
+  lastname: string | null
+  email: string
+}
+
+export interface RequestListItem extends ServiceRequest {
+  userCreator: RequestUserSummary
+  assignedOperator: RequestUserSummary | null
+}
+
+export interface RequestStatusHistory {
+  id: string
+  status: RequestStatus
+  requestId: string
+  assigningUserId: string | null
+  assigningUser: RequestUserSummary | null
+  createdAt: string
+}
+
+export interface RequestDetails extends RequestListItem {
+  statusHistory: RequestStatusHistory[]
+}
+
 export interface CreateRequestInput {
   title: string
   description: string
@@ -26,7 +50,7 @@ export interface CreateRequestInput {
 }
 
 export interface PaginatedRequests {
-  items: ServiceRequest[]
+  items: RequestListItem[]
   page: number
   pageSize: number
   total: number

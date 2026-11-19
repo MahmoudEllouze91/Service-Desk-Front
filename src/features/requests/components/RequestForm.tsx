@@ -1,6 +1,8 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { createRequest } from '../services/requestService'
+import { getUsers } from '../services/userService'
 import type { ServiceRequest, RequestUrgency } from '../types/request.types'
+import type { ServiceUser } from '../types/user.types'
 
 interface RequestFormProps {
   onCreated: (request: ServiceRequest) => void
@@ -19,8 +21,37 @@ function RequestForm({ onCreated }: RequestFormProps) {
   const [category, setCategory] = useState('')
   const [urgency, setUrgency] = useState<RequestUrgency>('NORMAL')
   const [userCreatorId, setUserCreatorId] = useState('')
+  const [users, setUsers] = useState<ServiceUser[]>([])
+  const [usersLoading, setUsersLoading] = useState(true)
+  const [usersError, setUsersError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const controller = new AbortController()
+
+    async function loadUsers() {
+      try {
+        const availableUsers = await getUsers(controller.signal)
+        setUsers(availableUsers)
+      } catch (requestError) {
+        if (!controller.signal.aborted) {
+          setUsersError(
+            requestError instanceof Error
+              ? requestError.message
+              : 'An unexpected error occurred while loading users.',
+          )
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setUsersLoading(false)
+        }
+      }
+    }
+
+    void loadUsers()
+    return () => controller.abort()
+  }, [])
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -127,22 +158,47 @@ function RequestForm({ onCreated }: RequestFormProps) {
         </div>
       </div>
 
+      {usersError && (
+        <div className="alert alert-danger" role="alert">
+          {usersError}
+        </div>
+      )}
+
       <div className="mb-4">
         <label htmlFor="request-creator" className="form-label">
-          Creator ID
+          Requester
         </label>
-        <input
+        <select
           id="request-creator"
-          className="form-control"
-          type="text"
+          className="form-select"
           value={userCreatorId}
           onChange={(event) => setUserCreatorId(event.target.value)}
           required
-          autoComplete="off"
+          disabled={usersLoading || usersError !== null || users.length === 0}
           aria-describedby="creator-help"
-        />
+        >
+          <option value="">
+            {usersLoading ? 'Loading users…' : 'Select a requester'}
+          </option>
+          {users.map((user) => {
+            const name = [user.firstname, user.lastname]
+              .filter((part) => part !== null && part.trim().length > 0)
+              .join(' ')
+            return (
+              <option key={user.id} value={user.id}>
+                {name ? `${name} (${user.email})` : user.email}
+              </option>
+            )
+          })}
+        </select>
         <div id="creator-help" className="form-text">
-          Enter the ID of the requester who is submitting this request.
+          {usersLoading
+            ? 'Loading available users.'
+            : usersError
+              ? 'Users could not be loaded. Please try again later.'
+              : users.length === 0
+                ? 'No users are available to create a request.'
+                : 'Choose the user submitting this request.'}
         </div>
       </div>
 
@@ -150,7 +206,16 @@ function RequestForm({ onCreated }: RequestFormProps) {
         <a className="btn btn-outline-secondary" href="/requests">
           Cancel
         </a>
-        <button className="btn btn-primary" type="submit" disabled={submitting}>
+        <button
+          className="btn btn-primary"
+          type="submit"
+          disabled={
+            submitting ||
+            usersLoading ||
+            usersError !== null ||
+            users.length === 0
+          }
+        >
           {submitting ? (
             <>
               <span

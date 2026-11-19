@@ -1,5 +1,6 @@
 import RequestPage from '../features/requests/pages/RequestPage'
 import CreateRequestPage from '../features/requests/pages/CreateRequestPage'
+import RequestDetailsPage from '../features/requests/pages/RequestDetailsPage'
 
 function AppRouter() {
   const path = window.location.pathname.replace(/\/+$/, '') || '/'
@@ -10,6 +11,15 @@ function AppRouter() {
 
   if (path === '/requests/new') {
     return <CreateRequestPage />
+  }
+
+  const requestDetailsMatch = path.match(/^\/requests\/([^/]+)$/)
+  if (requestDetailsMatch) {
+    return (
+      <RequestDetailsPage
+        requestId={decodeURIComponent(requestDetailsMatch[1])}
+      />
+    )
   }
 
   return (

@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react'
-import { getRequests } from '../services/requestService'
+import { advanceRequestStatus, getRequests } from '../services/requestService'
 import type {
   RequestSortBy,
   RequestSortOrder,
+  RequestListItem,
   RequestStatus,
-  ServiceRequest,
 } from '../types/request.types'
 
 export function useRequest() {
-  const [requests, setRequests] = useState<ServiceRequest[]>([])
+  const [requests, setRequests] = useState<RequestListItem[]>([])
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const [titleFilter, setTitleFilterState] = useState('')
@@ -63,15 +63,7 @@ export function useRequest() {
       window.clearTimeout(timer)
       controller.abort()
     }
-  }, [
-    page,
-    pageSize,
-    titleFilter,
-    statusFilter,
-    sortBy,
-    sortOrder,
-    reloadKey,
-  ])
+  }, [page, pageSize, titleFilter, statusFilter, sortBy, sortOrder, reloadKey])
 
   return {
     requests,
@@ -105,6 +97,10 @@ export function useRequest() {
     setSortOrder: (value: RequestSortOrder) => {
       setSortOrderState(value)
       setPage(1)
+    },
+    advanceStatus: async (requestId: string) => {
+      await advanceRequestStatus(requestId)
+      setReloadKey((key) => key + 1)
     },
     reload: () => setReloadKey((key) => key + 1),
   }
