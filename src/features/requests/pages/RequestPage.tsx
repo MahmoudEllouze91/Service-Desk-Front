@@ -1,5 +1,5 @@
-import RequestTable from "../components/RequestTable";
-import { useRequest } from "../hooks/useRequest";
+import RequestTable from '../components/RequestTable'
+import { useRequest } from '../hooks/useRequest'
 
 function RequestPage() {
   const {
@@ -21,7 +21,8 @@ function RequestPage() {
     setSortBy,
     setSortOrder,
     reload,
-  } = useRequest();
+    advanceStatus,
+  } = useRequest()
 
   return (
     <main className="container py-5">
@@ -50,7 +51,7 @@ function RequestPage() {
           </h2>
           {!loading && !error && (
             <span className="badge rounded-pill text-bg-light">
-              {total} {total === 1 ? "request" : "requests"}
+              {total} {total === 1 ? 'request' : 'requests'}
             </span>
           )}
         </div>
@@ -132,12 +133,13 @@ function RequestPage() {
                 requests={requests}
                 sortBy={sortBy}
                 sortOrder={sortOrder}
+                onAdvanceStatus={advanceStatus}
                 onSort={(column) => {
                   if (sortBy === column) {
-                    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+                    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
                   } else {
-                    setSortBy(column);
-                    setSortOrder("desc");
+                    setSortBy(column)
+                    setSortOrder('desc')
                   }
                 }}
               />
@@ -145,7 +147,7 @@ function RequestPage() {
             <div className="card-footer bg-white d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
               <div className="small text-body-secondary" aria-live="polite">
                 {total === 0
-                  ? "No requests to display"
+                  ? 'No requests to display'
                   : `Showing ${(page - 1) * pageSize + 1}–${Math.min(
                       page * pageSize,
                       total,
@@ -174,7 +176,7 @@ function RequestPage() {
                 </label>
                 <nav aria-label="Request pages">
                   <ul className="pagination pagination-sm mb-0">
-                    <li className={`page-item${page <= 1 ? " disabled" : ""}`}>
+                    <li className={`page-item${page <= 1 ? ' disabled' : ''}`}>
                       <button
                         className="page-link"
                         type="button"
@@ -191,7 +193,7 @@ function RequestPage() {
                       </span>
                     </li>
                     <li
-                      className={`page-item${page >= totalPages ? " disabled" : ""}`}
+                      className={`page-item${page >= totalPages ? ' disabled' : ''}`}
                     >
                       <button
                         className="page-link"
@@ -211,7 +213,7 @@ function RequestPage() {
         )}
       </section>
     </main>
-  );
+  )
 }
 
-export default RequestPage;
+export default RequestPage

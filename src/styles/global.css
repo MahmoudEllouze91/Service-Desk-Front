@@ -47,3 +47,16 @@
 .font-sans {
   font-family: var(--bs-body-font-family);
 }
+
+.request-status-dialog {
+  width: min(100% - 2rem, 32rem);
+  max-width: none;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+}
+
+.request-status-dialog::backdrop {
+  background: rgb(0 0 0 / 50%);
+}
